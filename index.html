@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title> KUDA-Dynamics </title>
+	<link href="res/css/bootstrap.min.css" rel="stylesheet">
+	<script src="res/css/fa.js"></script>
+
+	<style>
+      .header {
+        width: auto;
+        padding-top: 4rem;
+        padding-bottom: 2rem;
+      }
+
+      a:link,a:visited
+      {
+        color: #0071bc;
+        text-decoration: none;
+      }
+
+      a:hover {
+        color: #208799;
+      }
+
+      .section-div {height: 3em}
+      .content-div {height: 1em}
+
+      .no-gutters {
+	      margin-right: 0;
+	      margin-left: 0;
+      }
+
+	  .btn {
+	      margin-left: 0.2rem;
+	  	  margin-right: 0.2rem;
+	  }
+
+	</style>
+</head>
+
+<div class="header">
+	<center><h1>KUDA: Keypoints to Unify Dynamics Learning and Visual Prompting <br>
+		for Open-Vocabulary Robotic Manipulation</h1></center>
+	<div class="content-div"></div>
+	<center>
+		<a href="https://storeblank.github.io/" target="_blank" style="font-size:18px">Zixian Liu</a><sup style="font-size:12px">&nbsp*1</sup>,&nbsp
+		<a href="https://robo-alex.github.io/" target="_blank" style="font-size:18px">Mingtong Zhang</a><sup style="font-size:12px">&nbsp*2</sup>,&nbsp
+		<a href="https://yunzhuli.github.io/" target="_blank" style="font-size:18px">Yunzhu Li</a><sup style="font-size:12px">&nbsp3</sup>
+	</center>
+
+	<center>
+		<sup style="font-size:12px">&nbsp*</sup> Equal Contribution
+	</center>
+
+	<div class="content-div"></div>
+	<center>
+		<sup style="font-size:12px">1</sup>&nbspTsinghua University,
+		<sup style="font-size:12px">2</sup>&nbspUniversity of Illinois Urbana-Champaign,
+		<sup style="font-size:12px">3</sup>&nbspColumbia University
+	</center>
+
+	<div class="content-div"></div>
+	<center>
+		<div class="btn-group" role="group">
+
+			<a href="https://kuda-dynamics.github.io/" target="_blank">
+				<button type="button" class="btn btn-dark"><span class="icon">
+					<i class="fas fa-file-pdf"></i> Paper
+				</span></button>
+			</a>
+
+			<a href="https://kuda-dynamics.github.io/" target="_blank">
+				<button type="button" class="btn btn-dark"><span class="icon">
+					<i class="fab fa-github"></i> Code (Coming Soon)
+				</span></button>
+			</a>
+
+<!--			<a href="">-->
+<!--				<button type="button" class="btn btn-dark"><span class="icon">-->
+<!--					<i class="fab fa-youtube"></i> Video-->
+<!--				</span></button>-->
+<!--			</a>-->
+
+			<!-- <a href="https://storeblank.github.io/">
+				<button type="button" class="btn btn-dark"><span class="icon">
+					<i class="fab fa-twitter"></i> Twitter
+				</span></button>
+        	</a> -->
+
+		</div>
+	</center>
+</div>
+
+<div class="container">
+	<!--------------------- abstract --------------------->
+	<center>
+		<h2> Abstract </h2>
+		<div class="content-div"></div>
+		<p style="width:75%; text-align: justify; white-space: normal;"> With the rapid advancement of large language models (LLMs) and vision-language models (VLMs), significant progress has been made in developing open-vocabulary robotic manipulation systems. However, many existing approaches overlook the importance of object dynamics, limiting their applicability to more complex, dynamic tasks. In this work, we introduce KUDA, an open-vocabulary manipulation system that integrates dynamics learning and visual prompting through keypoints, leveraging both VLMs and learning-based neural dynamics models. Our key insight is that a <b>keypoint-based target specification</b> is simultaneously interpretable by VLMs and can be efficiently translated into cost functions for model-based planning. Given language instructions and visual observations, KUDA first assigns keypoints to the RGB image and queries the VLM to generate target specifications. These abstract keypoint-based representations are then converted into cost functions, which are optimized using a learned dynamics model to produce robotic trajectories. We evaluate KUDA on a range of manipulation tasks, including free-form language instructions across diverse object categories, multi-object interactions, and deformable or granular objects, demonstrating the effectiveness of our framework. </p>
+	</center>
+
+	<div class="content-div"></div>
+	<div class="col">
+		<center><video playsinline autoplay loop muted controls src="videos/kuda_teaser.mp4" width="100%" preload="metadata"
+			   style="border-radius:10px;"></video>
+		</center>
+	</div>
+
+	<div class="content-div"></div>
+
+	<center>
+		<h2> Overview </h2>
+	</center>
+	<div class="content-div"></div>
+	<div class="col">
+		<center><img class="img-fluid" src="res/teaser.png" style="margin-bottom: 30px" width="100%" alt=""><br>
+			<p style="width:75%; text-align: justify; white-space: normal;"> <b>KUDA</b> is an open-vocabulary manipulation system that unifies the visual prompting of vision language models (VLMs) and dynamics modeling with keypoints. Taking the RGBD observation and the language instruction as inputs, KUDA samples keypoints in the environment, then uses a VLM to generate code specifying keypoint-based target specification. These keypoints are translated into a cost function for model-based planning with learned dynamics models, enabling complex open-vocabulary manipulation across various object categories. </p>
+		</center>
+	</div>
+
+
+	<center>
+		<div class="section-div"></div>
+		<h2> Method </h2>
+		<div class="content-div"></div>
+		<img class="img-fluid" src="res/method.png" style="margin-bottom: 30px" width="100%" alt=""><br>
+		<p style="width:75%; text-align: justify; white-space: normal;"> Taking the RGBD observations and a language instruction as inputs, we first utilize the large vision model to obtain the keypoints and label them on the RGB image to obtain the visual prompt (green dot C marks the center reference point). Next, the vision-language model generates code for target specifications, which are projected into 3D space to construct the 3D objectives. Last, we utilize the pre-trained dynamics model for model-based planning. After a certain number of actions have been performed, the VLM is re-queried using the current observation, enabling high-level closed-loop control to correct VLM errors. </p>
+	</center>
+
+
+	<div class="section-div"></div>
+	<center>
+		<h2> Results </h2>
+	</center>
+	<div class="content-div"></div>
+	<div class="row align-items-start"> <!-- First Row of Videos -->
+		<div class="col-md-6 d-flex flex-column align-items-center">
+			<div class="content-div"></div>
+			<video playsinline autoplay loop muted controls src="videos/cube_00_v2.mp4" width="99%" style="border-radius:10px;"></video>
+			<!-- <p style="width:85%; text-align: center; white-space: normal;"> 
+				Divide the cubes of different colors into two pieces. 
+			</p> -->
+		</div>
+		<div class="col-md-6 d-flex flex-column align-items-center">
+			<div class="content-div"></div>
+			<video playsinline autoplay loop muted controls src="videos/cube_01_v2.mp4" width="99%" style="border-radius:10px;"></video>
+			<!-- <p style="width:85%; text-align: center; white-space: normal;"> 
+				Move the yellow cubes to the red cross and the green cubes to the blue cross.
+			</p> -->
+		</div>
+	</div>
+	
+	<div class="content-div"></div>
+	<div class="row align-items-start"> <!-- Second Row of Videos -->
+		<div class="col-md-6 d-flex flex-column align-items-center">
+			<div class="content-div"></div>
+			<video playsinline autoplay loop muted controls src="videos/cube_02_v2.mp4" width="99%" style="border-radius:10px;"></video>
+			<!-- <p style="width:85%; text-align: center; white-space: normal;"> 
+				Move the purple cubes to the red cross.
+			</p> -->
+		</div>
+		<div class="col-md-6 d-flex flex-column align-items-center">
+			<div class="content-div"></div>
+			<video playsinline autoplay loop muted controls src="videos/cube_03_v2.mp4" width="99%" style="border-radius:10px;"></video>
+			<!-- <p style="width:85%; text-align: center; white-space: normal;"> 
+				Move all the cubes to the triangle.
+			</p> -->
+		</div>
+	</div>
+	
+	<div class="content-div"></div>
+	<div class="row align-items-start"> <!-- Third Row of Videos -->
+		<div class="col-md-6 d-flex flex-column align-items-center">
+			<div class="content-div"></div>
+			<video playsinline autoplay loop muted controls src="videos/cube_04_v2.mp4" width="99%" style="border-radius:10px;"></video>
+			<!-- <p style="width:85%; text-align: center; white-space: normal;"> 
+				Move the cubes to the sticker that writes 'pink'.
+			</p> -->
+		</div>
+		<div class="col-md-6 d-flex flex-column align-items-center">
+			<div class="content-div"></div>
+			<video playsinline autoplay loop muted controls src="videos/cube_05_v2.mp4" width="99%" style="border-radius:10px;"></video>
+			<!-- <p style="width:85%; text-align: center; white-space: normal;"> 
+				Move the cubes to the sticker of the pink color.
+			</p> -->
+		</div>
+	</div>
+
+	<div class="content-div"></div>
+	<div class="row align-items-start"> <!-- Third Row of Videos -->
+		<div class="col-md-6 d-flex flex-column align-items-center">
+			<div class="content-div"></div>
+			<video playsinline autoplay loop muted controls src="videos/rope_00_v2.mp4" width="99%" style="border-radius:10px;"></video>
+			<!-- <p style="width:85%; text-align: center; white-space: normal;"> 
+				Manipulate the rope to make a smile face.
+			</p> -->
+		</div>
+		<div class="col-md-6 d-flex flex-column align-items-center">
+			<div class="content-div"></div>
+			<video playsinline autoplay loop muted controls src="videos/rope_01_v2.mp4" width="99%" style="border-radius:10px;"></video>
+			<!-- <p style="width:85%; text-align: center; white-space: normal;"> 
+				Put the ends of the rope together.
+			</p> -->
+		</div>
+	</div>
+
+	<div class="content-div"></div>
+	<div class="row align-items-start"> <!-- Third Row of Videos -->
+		<div class="col-md-6 d-flex flex-column align-items-center">
+			<div class="content-div"></div>
+			<video playsinline autoplay loop muted controls src="videos/rope_02_v2.mp4" width="99%" style="border-radius:10px;"></video>
+			<!-- <p style="width:85%; text-align: center; white-space: normal;"> 
+				Move the ends of the rope to form a fraction 1/9 on the table.
+			</p> -->
+		</div>
+		<div class="col-md-6 d-flex flex-column align-items-center">
+			<div class="content-div"></div>
+			<video playsinline autoplay loop muted controls src="videos/rope_03_v2.mp4" width="99%" style="border-radius:10px;"></video>
+			<!-- <p style="width:85%; text-align: center; white-space: normal;"> 
+				Straighten the rope.
+			</p> -->
+		</div>
+	</div>
+
+	<div class="content-div"></div>
+	<div class="row align-items-start"> <!-- Third Row of Videos -->
+		<div class="col-md-6 d-flex flex-column align-items-center">
+			<div class="content-div"></div>
+			<video playsinline autoplay loop muted controls src="videos/granular_00_v2.mp4" width="99%" style="border-radius:10px;"></video>
+			<!-- <p style="width:85%; text-align: center; white-space: normal;"> 
+				Collect all the candies together.
+			</p> -->
+		</div>
+		<div class="col-md-6 d-flex flex-column align-items-center">
+			<div class="content-div"></div>
+			<video playsinline autoplay loop muted controls src="videos/granular_01_v2.mp4" width="99%" style="border-radius:10px;"></video>
+			<!-- <p style="width:85%; text-align: center; white-space: normal;"> 
+				Collect all the coffee beans into a pile.
+			</p> -->
+		</div>
+	</div>
+
+	<div class="content-div"></div>
+	<div class="row align-items-start"> <!-- Third Row of Videos -->
+		<div class="col-md-6 d-flex flex-column align-items-center">
+			<div class="content-div"></div>
+			<video playsinline autoplay loop muted controls src="videos/granular_02_v2.mp4" width="99%" style="border-radius:10px;"></video>
+			<!-- <p style="width:85%; text-align: center; white-space: normal;"> 
+				Push the 2 piles of coffee beans into the square.
+			</p> -->
+		</div>
+		<div class="col-md-6 d-flex flex-column align-items-center">
+			<div class="content-div"></div>
+			<video playsinline autoplay loop muted controls src="videos/granular_03_v2.mp4" width="99%" style="border-radius:10px;"></video>
+			<!-- <p style="width:85%; text-align: center; white-space: normal;"> 
+				Collect all the coffee beans into the square.
+			</p> -->
+		</div>
+	</div>
+
+
+	<div class="content-div"></div>
+	<div class="row align-items-start"> <!-- Third Row of Videos -->
+		<div class="col-md-6 d-flex flex-column align-items-center">
+			<div class="content-div"></div>
+			<video playsinline autoplay loop muted controls src="videos/T_00_v2.mp4" width="99%" style="border-radius:10px;"></video>
+			<!-- <p style="width:85%; text-align: center; white-space: normal;"> 
+				Push the T shape to make a word 'AT'.
+			</p> -->
+		</div>
+		<div class="col-md-6 d-flex flex-column align-items-center">
+			<div class="content-div"></div>
+			<video playsinline autoplay loop muted controls src="videos/T_01_v2.mp4" width="99%" style="border-radius:10px;"></video>
+			<!-- <p style="width:85%; text-align: center; white-space: normal;"> 
+				Push the T shape to make a word 'ROBOT'.
+			</p> -->
+		</div>
+
+	<div class="content-div"></div>
+	<div class="row align-items-start"> <!-- Third Row of Videos -->
+		<center>
+			<p style="width:90%; text-align: center; white-space: normal;"> 
+				We show the target specification and robot executions of various tasks on different objects, highlight the effectiveness of our framework. We show the initial state and the target specification visualization of our system, along with the robot executions, to demonstrate the performance of our framework on various manipulation tasks. Note that we show the granular collection task to exhibit how our VLM-level closed-loop control works in our two VLM-level loops.
+			</p>
+		</center>
+	</div>
+	</div>
+
+	<div class="section-div"></div>
+	<center>
+		<h2> Real-World Results with Disturbances</h2>
+	</center>
+	<div class="content-div"></div>
+	<div class="row align-items-start"> <!-- First Row of Videos -->
+		<div class="col-md-6 d-flex flex-column align-items-center">
+			<div class="content-div"></div>
+			<video playsinline autoplay loop muted controls src="videos/disturbance_00_16x.mp4" width="99%" style="border-radius:10px;"></video>
+			<!-- <p style="width:85%; text-align: center; white-space: normal;"> 
+				Divide the cubes of different colors into two pieces. 
+			</p> -->
+		</div>
+		<div class="col-md-6 d-flex flex-column align-items-center">
+			<div class="content-div"></div>
+			<video playsinline autoplay loop muted controls src="videos/disturbance_01_16x.mp4" width="99%" style="border-radius:10px;"></video>
+			<!-- <p style="width:85%; text-align: center; white-space: normal;"> 
+				Move the yellow cubes to the red cross and the green cubes to the blue cross.
+			</p> -->
+		</div>
+	</div>
+
+
+	
+	
+	
+	
+	<!-- <div class="row align-items-center">
+		<div class="col-md-6 align-column-center">
+			<center>
+			</center>
+			<div class="content-div"></div>
+			<center>
+				<video playsinline autoplay loop muted src="videos/cube_color.mp4" width="99%" style="border-radius:10px;"></video>
+				<p style="width:85%; text-align: center; white-space: normal;"> 
+					Divide the cubes of different colors into two pieces. 
+				</p>				
+			</center>
+		</div>
+		<div class="col-md-6 align-column-center">
+			<center>
+				<div class="content-div"></div>
+				<video playsinline autoplay loop muted src="videos/cube_color_02.mp4" width="99%" style="border-radius:10px;"></video>
+				<p style="width:85%; text-align: center; white-space: normal;"> 
+					Move the yellow cubes to the red cross and the green cubes to the blue cross.
+				</p>
+			</center>
+		</div>
+	</div> -->
+
+	<div class="section-div"></div>
+	<center>
+		<h2> Analysis: Error Breakdown of KUDA</h2>
+	</center>
+	<div class="content-div"></div>
+	<div class="col">
+		<center><img class="img-fluid" src="res/analysis.png" style="margin-bottom: 30px" width="100%" alt=""><br>
+			<p style="width:75%; text-align: justify; white-space: normal;"> Success and failure cases during our evaluation, arranged by the process in a loop. We provide the detailed breakdown for each failure mode, marked with red. While we achieved a success rate of 80% on a total of 60 trials for various tasks, the leading causes of failure were perception errors, which accounted for 10% of the total trials and 50% of all the failure cases. </p>
+		</center>
+	</div>
+
+	<!--------------------- Bibtex --------------------->
+	<div class="content-div"></div>
+	<center><h2> Bibtex </h2></center>
+	<div class="content-div"></div>
+	<pre>
+	  @article{liu2024kuda,
+	     author={Liu, Zixian and Zhang, Mingtong and Li, Yunzhu},
+	     title={KUDA: Keypoints to Unify Dynamics Learning and Visual Prompting for Open-Vocabulary Robotic Manipulation},
+	     journal={arXiv},
+	     year={2024}
+	   }
+	</pre>
+
+
+	<div class="section-div"></div>
+
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<!-- Include all compiled plugins (below), or include individual files as needed -->
+	<script src="res/js/bootstrap.min.js"></script>
+</div>
+
+</html>
